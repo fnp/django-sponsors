@@ -1,0 +1,17 @@
+.sponsors-page {
+    background: white;
+    margin-top: 1em;
+}
+
+.sponsors-column {
+    float: left;
+    width: 150px;
+}
+
+.sponsor-logos {
+    height: 130px;
+}
+
+.sponsors-page img {
+    float: left;
+}
