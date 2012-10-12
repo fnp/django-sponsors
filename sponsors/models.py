@@ -4,6 +4,7 @@
 #
 import time
 from StringIO import StringIO
+from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.template.loader import render_to_string
@@ -12,8 +13,8 @@ from PIL import Image
 from jsonfield import JSONField
 from django.core.files.base import ContentFile
 
-THUMB_WIDTH = 120
-THUMB_HEIGHT = 120
+THUMB_WIDTH = getattr(settings, 'SPONSORS_THUMB_WIDTH', 120)
+THUMB_HEIGHT = getattr(settings, 'SPONSORS_THUMB_HEIGHT', 120)
 
 
 class Sponsor(models.Model):
@@ -31,6 +32,16 @@ class Sponsor(models.Model):
         else:
             return self.name
 
+    def size(self):
+        width, height = THUMB_WIDTH, THUMB_HEIGHT
+        if width is None:
+            simg = Image.open(self.logo.path)
+            width = int(float(simg.size[0]) / simg.size[1] * height)
+        elif height is None:
+            simg = Image.open(self.logo.path)
+            height = int(float(simg.size[1]) / simg.size[0] * width)
+        return width, height
+
 
 class SponsorPage(models.Model):
     name = models.CharField(_('name'), max_length=120)
@@ -46,10 +57,12 @@ class SponsorPage(models.Model):
             sponsor_objects = Sponsor.objects.in_bulk(column['sponsors'])
             for sponsor_pk in column['sponsors']:
                 try:
-                    result_group['sponsors'].append((offset, sponsor_objects[sponsor_pk]))
-                    offset -= THUMB_HEIGHT
+                    sponsor = sponsor_objects[sponsor_pk]
                 except KeyError:
                     pass
+                else:
+                    result_group['sponsors'].append((offset, sponsor))
+                    offset -= sponsor.size()[1]
             result.append(result_group)
         return result
 
@@ -58,21 +71,32 @@ class SponsorPage(models.Model):
         for column in self.sponsors:
             sponsor_ids.extend(column['sponsors'])
         sponsors = Sponsor.objects.in_bulk(sponsor_ids)
-        sprite = Image.new('RGBA', (THUMB_WIDTH, len(sponsors) * THUMB_HEIGHT))
+        total_width = 0
+        total_height = 0
+        for sponsor in sponsors.values():
+            w, h = sponsor.size()
+            total_width = max(total_width, w)
+            total_height += h
+        sprite = Image.new('RGBA', (total_width, total_height))
+        offset = 0
         for i, sponsor_id in enumerate(sponsor_ids):
-            simg = Image.open(sponsors[sponsor_id].logo.path)
-            if simg.size[0] > THUMB_WIDTH or simg.size[1] > THUMB_HEIGHT:
+            sponsor = sponsors[sponsor_id]
+            simg = Image.open(sponsor.logo.path)
+            thumb_size = sponsor.size()
+            # FIXME: This is too complicated now.
+            if simg.size[0] > thumb_size[0] or simg.size[1] > thumb_size[1]:
                 size = (
-                    min(THUMB_WIDTH, 
-                        simg.size[0] * THUMB_HEIGHT / simg.size[1]),
-                    min(THUMB_HEIGHT,
-                        simg.size[1] * THUMB_WIDTH / simg.size[0])
+                    min(thumb_size[0], 
+                        simg.size[0] * thumb_size[1] / simg.size[1]),
+                    min(thumb_size[1],
+                        simg.size[1] * thumb_size[0] / simg.size[0])
                 )
                 simg = simg.resize(size, Image.ANTIALIAS)
             sprite.paste(simg, (
-                    (THUMB_WIDTH - simg.size[0]) / 2,
-                    i * THUMB_HEIGHT + (THUMB_HEIGHT - simg.size[1]) / 2,
+                    (thumb_size[0] - simg.size[0]) / 2,
+                    offset + (thumb_size[1] - simg.size[1]) / 2,
                     ))
+            offset += thumb_size[1]
         imgstr = StringIO()
         sprite.save(imgstr, 'png')
 
@@ -88,7 +112,7 @@ class SponsorPage(models.Model):
         self.render_sprite()
         self._html = render_to_string('sponsors/page.html', {
             'sponsors': self.populated_sponsors(),
-            'page': self
+            'page': self,
         })
         return super(SponsorPage, self).save(*args, **kwargs)
 

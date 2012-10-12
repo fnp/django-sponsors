@@ -4,9 +4,11 @@
             <p class="sponsors-column-name">{{ column.name|default:"&nbsp;" }}</p>
             <div class='sponsor-logos'>
                 {% for offset, sponsor in column.sponsors %}
+                    {% with sponsor.size as thumb_size %}
                     <a href="{{ sponsor.url }}" title="{{ sponsor.description }}" 
-                        style='display:block; background: url({{ page.sprite.url }}) 0px {{ offset }}px no-repeat; width: 120px; height: 120px;'>
+                        style='display:block; background: url({{ page.sprite.url }}) 0px {{ offset }}px no-repeat; width: {{ thumb_size.0 }}px; height: {{ thumb_size.1 }}px;'>
                     </a>
+                    {% endwith %}
                 {% endfor %}
             </div>
         </div>
