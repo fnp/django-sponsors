@@ -1,3 +1,5 @@
+include LICENSE
+include README.md
 recursive-include sponsors/templates *.html
 recursive-include sponsors/locale *.po *.mo
 recursive-include sponsors/static *.js *.css
