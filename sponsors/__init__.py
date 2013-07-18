@@ -3,5 +3,5 @@
 # Copyright © Fundacja Nowoczesna Polska. See NOTICE for more information.
 #
 __author__ = 'Marek Stępniowski, <marek@stepniowski.com>'
-__version__ = '1.0'
+__version__ = '1.1'
 __maintainer__ = 'Radek Czajka <radoslaw.czajka@nowoczesnapolska.org.pl>'
