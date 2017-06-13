@@ -4,10 +4,11 @@
 import os.path
 from setuptools import setup, find_packages
 
+
 def whole_trees(package_dir, paths):
     def whole_tree(prefix, path):
         files = []
-        for f in (f for f in os.listdir(os.path.join(prefix, path)) if not f[0]=='.'):
+        for f in (f for f in os.listdir(os.path.join(prefix, path)) if not f[0] == '.'):
             new_path = os.path.join(path, f)
             if os.path.isdir(os.path.join(prefix, new_path)):
                 files.extend(whole_tree(prefix, new_path))
@@ -22,15 +23,14 @@ def whole_trees(package_dir, paths):
 
 setup(
     name='django-sponsors',
-    version='1.1',
+    version='1.2',
     author='Marek Stępniowski',
     author_email='marek@stepniowski.com',
-    maintainer='Radek Czajka',
-    maintainer_email='radoslaw.czajka@nowoczesnapolska.org.pl',
-    url = '',
+    maintainer='Jan Szejko',
+    maintainer_email='jan.szejko@nowoczesnapolska.org.pl',
+    url='',
     packages=find_packages(),
-    package_data={'sponsors': whole_trees('sponsors', 
-            ['templates', 'locale', 'static'])},
+    package_data={'sponsors': whole_trees('sponsors', ['templates', 'locale', 'static'])},
     license='LICENSE',
     description='Manage your lists of sponsors with Django admin.',
     long_description=open('README.md').read(),
