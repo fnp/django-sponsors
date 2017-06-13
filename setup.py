@@ -23,7 +23,7 @@ def whole_trees(package_dir, paths):
 
 setup(
     name='django-sponsors',
-    version='2.0',
+    version='2.1',
     author='Marek Stępniowski',
     author_email='marek@stepniowski.com',
     maintainer='Jan Szejko',
