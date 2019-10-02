@@ -23,11 +23,11 @@ def whole_trees(package_dir, paths):
 
 setup(
     name='django-sponsors',
-    version='2.1',
+    version='2.2',
     author='Marek Stępniowski',
     author_email='marek@stepniowski.com',
-    maintainer='Jan Szejko',
-    maintainer_email='jan.szejko@nowoczesnapolska.org.pl',
+    maintainer='Radek Czajka',
+    maintainer_email='radekczajka@nowoczesnapolska.org.pl',
     url='',
     packages=find_packages(),
     package_data={'sponsors': whole_trees('sponsors', ['templates', 'locale', 'static'])},

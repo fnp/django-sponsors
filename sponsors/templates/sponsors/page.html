@@ -1,5 +1,6 @@
 <div class="sponsors-page">
     {% for column in sponsors %}
+      {% if column.sponsors %}
         <div class="sponsors-column">
             <p class="sponsors-column-name">{{ column.name|default:"&nbsp;" }}</p>
             <div class='sponsor-logos'>
@@ -12,6 +13,7 @@
                 {% endfor %}
             </div>
         </div>
+      {% endif %}
     {% endfor %}
     <div style="clear: both"></div>
 </div>
