@@ -10,6 +10,8 @@ nosetests.xml
 build
 dist
 *.egg-info
+/.tox
+/htmlcov
 
 # Mac OS X garbage
 .DS_Store

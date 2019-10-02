@@ -23,7 +23,7 @@ def whole_trees(package_dir, paths):
 
 setup(
     name='django-sponsors',
-    version='2.2',
+    version='2.3',
     author='Marek Stępniowski',
     author_email='marek@stepniowski.com',
     maintainer='Radek Czajka',
@@ -34,5 +34,8 @@ setup(
     license='LICENSE',
     description='Manage your lists of sponsors with Django admin.',
     long_description=open('README.md').read(),
-    install_requires=['jsonfield'],
+    install_requires=[
+        'Pillow',
+        'jsonfield',
+    ],
 )

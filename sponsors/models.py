@@ -2,16 +2,23 @@
 # This file is part of django-sponsors, licensed under GNU Affero GPLv3 or later.
 # Copyright © Fundacja Nowoczesna Polska. See NOTICE for more information.
 #
+from __future__ import unicode_literals
+
 import time
-from StringIO import StringIO
+try:
+    from io import BytesIO
+except ImportError:
+    # Python 2
+    from StringIO import StringIO as BytesIO
+
 from django.conf import settings
+from django.core.files.base import ContentFile
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.template.loader import render_to_string
 from PIL import Image
-
 from jsonfield import JSONField
-from django.core.files.base import ContentFile
+
 
 THUMB_WIDTH = getattr(settings, 'SPONSORS_THUMB_WIDTH', 120)
 THUMB_HEIGHT = getattr(settings, 'SPONSORS_THUMB_HEIGHT', 120)
@@ -77,6 +84,10 @@ class SponsorPage(models.Model):
             w, h = sponsor.size()
             total_width = max(total_width, w)
             total_height += h
+
+        if not total_height:
+            return
+
         sprite = Image.new('RGBA', (total_width, total_height))
         offset = 0
         for i, sponsor_id in enumerate(sponsor_ids):
@@ -93,11 +104,11 @@ class SponsorPage(models.Model):
                 )
                 simg = simg.resize(size, Image.ANTIALIAS)
             sprite.paste(simg, (
-                    (thumb_size[0] - simg.size[0]) / 2,
-                    offset + (thumb_size[1] - simg.size[1]) / 2,
+                    int((thumb_size[0] - simg.size[0]) / 2),
+                    int(offset + (thumb_size[1] - simg.size[1]) / 2),
                     ))
             offset += thumb_size[1]
-        imgstr = StringIO()
+        imgstr = BytesIO()
         sprite.save(imgstr, 'png')
 
         if self.sprite:
